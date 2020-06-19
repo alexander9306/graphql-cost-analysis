@@ -26,7 +26,7 @@ import type {
 export type CostAnalysisOptions = {
   maximumCost: number,
   variables?: Object,
-  onComplete?: (cost: number) => void,
+  onComplete?: (cost: number) => GraphQLError | null,
   createError?: (maximumCost: number, cost: number) => GraphQLError,
   defaultCost?: number,
   costMap?: Object,
@@ -122,12 +122,12 @@ export default class CostAnalysis {
   }
 
   onOperationDefinitionLeave (): ?GraphQLError {
-    if (this.options.onComplete) {
-      this.options.onComplete(this.cost)
-    }
-
     if (this.cost > this.options.maximumCost) {
       return this.context.reportError(this.createError())
+    }
+
+    if (this.options.onComplete) {
+      return this.context.reportError(this.options.onComplete(this.cost))
     }
   }
 
