@@ -127,7 +127,9 @@ export default class CostAnalysis {
     }
 
     if (this.options.onComplete) {
-      return this.context.reportError(this.options.onComplete(this.cost))
+      const verifyError = this.options.onComplete(this.cost)
+      return verifyError instanceof GraphQLError ? this.context.reportError(verifyError) : null
+      // return this.context.reportError(this.options.onComplete(this.cost))
     }
   }
 
